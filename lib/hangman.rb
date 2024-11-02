@@ -8,13 +8,7 @@ def pick_a_word
 end
 
 
-word = pick_a_word
-number_of_attemps = word.length
-win = false
 
-guess_word_array = Array.new(word.length, "-") # create the new arrays when a new word is pick
-word_array = word.chars
-incorrect_letters_array = Array.new
 
 options = {
 
@@ -24,6 +18,14 @@ options = {
 }
 
 loop do 
+
+    word = pick_a_word
+    number_of_attemps = word.length
+    win = false
+
+    guess_word_array = Array.new(word.length, "-") #player visual help
+    word_array = word.chars #comparision array
+    incorrect_letters_array = Array.new
 
     puts "Welcome, please select an option"
     options.each {|key,value| puts "#{key}. #{value}"}
@@ -54,9 +56,10 @@ loop do
                 win = true if guess_word_array == word_array
 
                 if win == true 
+                  puts ""
                   puts "Congratulations, you have won!"
                   puts ""
-                  # make all the new selections here
+                  
                     break
                 elsif number_of_attemps == 0
                     puts "Sorry, you have lost :( "
