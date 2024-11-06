@@ -80,8 +80,6 @@ loop do
 
                 end
                 
-
-
                 win = true if guess_word_array == word_array
 
                 if win == true 
@@ -95,16 +93,29 @@ loop do
                     break  
 
                 end
-
-               
-                
+                       
                 p word_array #remove this
                 puts ""
             
             end
         
         when "2"
-        # work in progress
+            contents = CSV.open(
+                'save.csv', 
+                headers: true,
+                header_converters: :symbol
+                ) 
+                id = 0
+                array_progress = []
+                contents.each do |row|
+                    id += 1
+                  progress = row[:current_guess_progress]
+                  array_progress.push(progress)
+                  puts "#{id}. #{progress}"
+                end
+                puts "which game would you like to load?"
+                answer = gets.chomp.to_i
+                puts "#{array_progress[answer-1]} is loading"
         when "3"
             break
                 
