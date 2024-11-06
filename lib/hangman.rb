@@ -1,14 +1,30 @@
 
+require "csv"
+
 def pick_a_word
-    contents = (File.readlines('google-10000-english-no-swears.txt').map {|line| line.strip})
-    contents.delete_if{|word| word.length < 5 || word.length > 12} # we need to pick a new word in case of new game
+
+    contents = (File.readlines("google-10000-english-no-swears.txt").map {|line| line.strip})
+    contents.delete_if{|word| word.length < 5 || word.length > 12} 
     number = rand(7557)
     word = contents[number]
 
 end
 
+def save_game(guess_arr,word_arr,incorrect_array,lives)
+    
+    Dir.mkdir("save") unless Dir.exist?("save")
 
+    CSV.open('save.csv', 'a') do |csv|
+      csv << ["current_guess_progress","word_array",
+              "incorrect words array", "lives"] if File.zero?("save.csv")
+      csv << [guess_arr,word_arr,incorrect_array,lives] # i need an id to recall the saved games or recall by guess_arr
+    end
 
+end
+
+def load_game
+  
+end
 
 options = {
 
@@ -27,6 +43,7 @@ loop do
     word_array = word.chars #comparision array
     incorrect_letters_array = Array.new
 
+    puts ""
     puts "Welcome, please select an option"
     options.each {|key,value| puts "#{key}. #{value}"}
     choice = gets.chomp
@@ -40,35 +57,48 @@ loop do
                 index = []
                 puts "Please pick a letter"
                 puts ""
+                puts "Word: #{guess_word_array}"
+                puts "Wrong letters #{incorrect_letters_array}"
                 puts "You have #{number_of_attemps} tries left"
+                puts "You can save the game at anytime by writing 'save'"
                 player_gues = gets.downcase.chomp
             
-                if word_array.include?(player_gues) == true
+                if player_gues == "save"
+                    game = save_game(guess_word_array,word_array,incorrect_letters_array,number_of_attemps)
+                    puts "Your gave have been saved!"
+                    break
+
+                elsif word_array.include?(player_gues) == true
                     word_array.each_with_index { |l, i| index.push(i) if l == player_gues }
-                    index.each do |position|
+                    index.each do |position|#this can be made in a line
                     guess_word_array[position] = player_gues #this can be made in a line
                     end
+
                 else
                     incorrect_letters_array.push(player_gues)
                     number_of_attemps = number_of_attemps - 1
+
                 end
                 
+
+
                 win = true if guess_word_array == word_array
 
                 if win == true 
                   puts ""
                   puts "Congratulations, you have won!"
                   puts ""
-                  
                     break
+
                 elsif number_of_attemps == 0
                     puts "Sorry, you have lost :( "
-                    break    
+                    break  
+
                 end
 
-                puts "Word: #{guess_word_array}"
-                puts "Wrong letters #{incorrect_letters_array}"
-                p word_array
+               
+                
+                p word_array #remove this
                 puts ""
             
             end
