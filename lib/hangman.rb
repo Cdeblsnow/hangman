@@ -1,5 +1,6 @@
 
 require "csv"
+require "json"
 
 def pick_a_word
 
@@ -12,13 +13,25 @@ end
 
 def save_game(guess_arr,word_arr,incorrect_array,lives)
     
-    Dir.mkdir("save") unless Dir.exist?("save")
+    data = { guess_arr: guess_arr,
+             word_arr: word_arr,
+             incorrect_array: incorrect_array,
+             lives: lives}
 
-    CSV.open('save.csv', 'a') do |csv|
-      csv << ["current_guess_progress","word_array",
-              "incorrect words array", "lives"] if File.zero?("save.csv")
-      csv << [guess_arr,word_arr,incorrect_array,lives] # i need an id to recall the saved games or recall by guess_arr
-    end
+    
+     myfile =  if File.exist?("save.json") #make sure the file exist
+                JSON.parse(File.read("save.json"))
+            else
+                []
+            end
+    
+           
+    myfile << data 
+
+    File.open("save.json", "w") do |file|
+        file.write(JSON.pretty_generate(myfile)) #save everything
+      end
+    
 
 end
 
@@ -100,22 +113,26 @@ loop do
             end
         
         when "2"
-            contents = CSV.open(
-                'save.csv', 
-                headers: true,
-                header_converters: :symbol
-                ) 
-                id = 0
-                array_progress = []
-                contents.each do |row|
-                    id += 1
-                  progress = row[:current_guess_progress]
-                  array_progress.push(progress)
-                  puts "#{id}. #{progress}"
-                end
-                puts "which game would you like to load?"
-                answer = gets.chomp.to_i
-                puts "#{array_progress[answer-1]} is loading"
+
+            my_save = if File.exist?("save.json")
+                        JSON.parse(File.read("save.json"))
+                    else 
+                        []
+                    end
+
+            list_of_saves = []
+
+            my_save.each_with_index do |game, index|
+              progress = game["guess_arr"]
+              list_of_saves.push(progress)
+              puts "#{index + 1}. #{progress}"
+            end
+
+                
+
+                
+                
+                
         when "3"
             break
                 
