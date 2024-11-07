@@ -1,5 +1,3 @@
-
-require "csv"
 require "json"
 
 def pick_a_word
@@ -35,9 +33,6 @@ def save_game(guess_arr,word_arr,incorrect_array,lives)
 
 end
 
-def load_game
-  
-end
 
 options = {
 
@@ -63,7 +58,7 @@ loop do
 
     case choice
 
-        when "1" || "y"
+        when "1" 
 
             loop do 
 
@@ -83,9 +78,7 @@ loop do
 
                 elsif word_array.include?(player_gues) == true
                     word_array.each_with_index { |l, i| index.push(i) if l == player_gues }
-                    index.each do |position|#this can be made in a line
-                    guess_word_array[position] = player_gues #this can be made in a line
-                    end
+                    index.each {|position| guess_word_array[position] = player_gues} #replace "-" with player guess if correct
 
                 else
                     incorrect_letters_array.push(player_gues)
@@ -103,13 +96,10 @@ loop do
 
                 elsif number_of_attemps == 0
                     puts "Sorry, you have lost :( "
+                    puts ""
                     break  
 
                 end
-                       
-                p word_array #remove this
-                puts ""
-            
             end
         
         when "2"
@@ -120,17 +110,67 @@ loop do
                         []
                     end
 
-            list_of_saves = []
-
             my_save.each_with_index do |game, index|
               progress = game["guess_arr"]
-              list_of_saves.push(progress)
               puts "#{index + 1}. #{progress}"
             end
+            
+            puts "Which game would you like to load"
+            answer = gets.chomp.to_i
+            game_selected = my_save[answer - 1]
 
-                
+            if game_selected
+                guess_word_array = game_selected["guess_arr"]
+                word_array = game_selected["word_arr"]
+                incorrect_letters_array = game_selected["incorrect_array"]
+                number_of_attemps = game_selected["lives"]
 
+            else
+                puts "Invalid selection"
+                break
+
+            end
+
+            loop do 
                 
+                index = []
+                puts "Please pick a letter"
+                puts ""
+                puts "Word: #{guess_word_array}"
+                puts "Wrong letters #{incorrect_letters_array}"
+                puts "You have #{number_of_attemps} tries left"
+                puts "You can save the game at anytime by writing 'save'"
+                player_gues = gets.downcase.chomp
+              
+                if player_gues == "save"
+                    game = save_game(guess_word_array,word_array,incorrect_letters_array,number_of_attemps)
+                    puts "Your gave have been saved!"
+                    break
+              
+                elsif word_array.include?(player_gues) == true
+                    word_array.each_with_index { |l, i| index.push(i) if l == player_gues }
+                    index.each {|position| guess_word_array[position] = player_gues} #replace "-" with player guess if correct
+              
+                else
+                    incorrect_letters_array.push(player_gues)
+                    number_of_attemps = number_of_attemps - 1
+              
+                end
+                
+                win = true if guess_word_array == word_array
+                if win == true 
+                  puts ""
+                  puts "Congratulations, you have won!"
+                  puts ""
+                    break
+              
+                elsif number_of_attemps == 0
+                    puts "Sorry, you have lost :( "
+                    puts ""
+                    break  
+              
+                end
+              end     
                 
                 
         when "3"
